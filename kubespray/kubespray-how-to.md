@@ -38,11 +38,6 @@ The machine from which you run Kubespray playbooks needs:
 #### Install Dependencies
 
 ```bash
-# Clone Kubespray repository
-git clone https://github.com/kubernetes-sigs/kubespray.git
-cd kubespray
-git checkout v2.29.1
-
 # Create Python virtual environment (recommended)
 python3 -m venv venv
 source venv/bin/activate
@@ -163,29 +158,6 @@ In cloud environments or when accessing nodes over the internet, you'll have:
 | `access_ip` | (Optional) Alternative IP for node access, defaults to `ip` | `10.0.0.1` |
 | `etcd_member_name` | Name for etcd cluster membership | `etcd1` |
 
-#### Example: Cloud/VPN Setup with Public + Private IPs
-
-```ini
-# ansible_host = Public IP (for SSH from your laptop/bastion)
-# ip = Private IP (for Kubernetes internal communication)
-
-[kube_control_plane]
-master1 ansible_host=203.0.113.10 ip=10.0.0.1 etcd_member_name=etcd1
-
-[etcd:children]
-kube_control_plane
-
-[kube_node]
-worker1 ansible_host=203.0.113.20 ip=10.0.0.10
-worker2 ansible_host=203.0.113.21 ip=10.0.0.11
-worker3 ansible_host=203.0.113.22 ip=10.0.0.12
-worker4 ansible_host=203.0.113.23 ip=10.0.0.13
-worker5 ansible_host=203.0.113.24 ip=10.0.0.14
-
-[k8s_cluster:children]
-kube_control_plane
-kube_node
-```
 
 > [!IMPORTANT]
 > **Key Points**:
@@ -662,19 +634,7 @@ ansible-playbook cluster.yml -b -i inventory/mycluster/inventory.ini \
   --tags=apps
 ```
 
----
 
-### 6.6 System Upgrade (OS Packages)
-
-Upgrade operating system packages during cluster upgrade:
-
-```bash
-ansible-playbook upgrade-cluster.yml -b -i inventory/mycluster/inventory.ini \
-  -e system_upgrade=true \
-  -e system_upgrade_reboot=on-upgrade  # or 'always' or 'never'
-```
-
----
 
 ### 6.7 Upgrade Verification
 
@@ -719,37 +679,9 @@ ansible-playbook -i inventory/mycluster/inventory.ini reset.yml \
 > [!CAUTION]
 > This is **destructive** - it removes all Kubernetes data and configurations.
 
----
 
-### 7.2 Recover Control Plane
 
-If a control plane node fails and needs recovery:
 
-```bash
-ansible-playbook -i inventory/mycluster/inventory.ini recover-control-plane.yml \
-  -b \
-  --limit=master1  # The node to recover
-```
-
----
-
-### 7.3 Certificate Rotation
-
-Kubernetes certificates expire (default 1 year). To renew:
-
-```bash
-# Automatic renewal (recommended setting in configuration)
-# In k8s-cluster.yml:
-auto_renew_certificates: true
-
-# Manual renewal
-ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml \
-  -b \
-  --tags=master \
-  -e "force_certificate_regeneration=true"
-```
-
----
 
 ## 8️⃣ Playbook Reference
 
