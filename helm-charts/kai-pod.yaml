@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-gpu-workload
+  labels:
+    kai.scheduler/queue: "devs"
+    priorityClassName: train
+  annotations:
+    gpu-fraction: "0.4"
+spec:
+  schedulerName: kai-scheduler
+  containers:
+    - name: worker
+      image: public.ecr.aws/data-on-eks/elyra-jupyter:3.15.0

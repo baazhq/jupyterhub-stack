@@ -1,0 +1,40 @@
+---
+apiVersion: scheduling.run.ai/v2
+kind: Queue
+metadata:
+  name: devs-parent
+spec:
+  priority: 125
+  reclaimMinRuntime: "5m"
+  resources:
+    cpu:
+      quota: 4000 # Enough for child queues
+      limit: -1
+      overQuotaWeight: 1
+    gpu:
+      quota: 2 # Fixed: was 0, now matches child needs
+      limit: -1
+      overQuotaWeight: 1
+    memory:
+      quota: 40000 # Enough for child queues
+      limit: -1
+      overQuotaWeight: 1
+---
+apiVersion: scheduling.run.ai/v2
+kind: Queue
+metadata:
+  name: devs
+spec:
+  parentQueue: devs-parent
+  priority: 125
+  reclaimMinRuntime: "5m"
+  resources:
+    cpu:
+      quota: 1000
+      limit: 2000
+    gpu:
+      quota: 2
+      limit: 4
+    memory:
+      quota: 20000
+      limit: 40000
