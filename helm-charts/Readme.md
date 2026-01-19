@@ -1,5 +1,5 @@
 To install gpu-operator and kai run the following command
-```
+```ShellSession
 $ cd gpu-operator
 $ helm install gpu-operator -n gpu-operator --create-namespace 
 $ cd ../kai-scheduler
