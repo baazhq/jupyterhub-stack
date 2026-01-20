@@ -1,0 +1,59 @@
+singleuser:
+  startTimeout: 1200 # 20 mins to spin up a notebook server for GPU including the image pull
+  profileList:
+    - display_name: Small (CPU)
+      description: "Small cpu notebook"
+      kubespawner_override:
+        image: public.ecr.aws/data-on-eks/elyra-jupyter:3.15.0
+        extra_labels:
+          hub.jupyter.org/workload: "cpu"
+        cpu_guarantee: 1
+        mem_guarantee: 1G
+        cpu_limit: 2
+        mem_limit: 1G
+      cmd: null
+    - display_name: Large (CPU)
+      description: "Large cpu notebook"
+      profile_options:
+        image:
+          display_name: "Image"
+          choices:
+            pyspark350:
+              display_name: "PySpark 3.5.0 + Python 3.11"
+              default: true
+              kubespawner_override:
+                image: jupyter/pyspark-notebook:spark-3.5.0
+            pyspark341:
+              display_name: "PySpark 3.4.1 + Python 3.11"
+              kubespawner_override:
+                image: jupyter/pyspark-notebook:spark-3.4.1
+      kubespawner_override:
+        node_selector:
+          node.kubernetes.io/instance-type: g4s.kube.large
+        extra_labels:
+          hub.jupyter.org/workload: "cpu"
+        cpu_guarantee: 1
+        mem_guarantee: 2G
+        cpu_limit: 3
+        mem_limit: 3G
+      cmd: null
+    - display_name: GPU Small
+      description: "Small GPU notebook"
+      kubespawner_override:
+        image: public.ecr.aws/data-on-eks/elyra-jupyter:3.15.0
+        cpu_guarantee: 1
+        mem_guarantee: 1G
+        cpu_limit: 2
+        mem_limit: 10G
+        scheduler_name: kai-scheduler
+        extra_labels:
+          kai.scheduler/queue: "devs"
+          hub.jupyter.org/workload: "gpu"
+        extra_annotations:
+          gpu-fraction: "0.5"
+
+prePuller:
+  hook:
+    enabled: false
+  continuous:
+    enabled: false

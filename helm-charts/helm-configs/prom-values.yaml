@@ -1,0 +1,6 @@
+kube-state-metrics:
+  enabled: true
+  metricLabelsAllowlist:
+    - pods=[app,component,hub.jupyter.org/workload]
+    - services=[app,component,app.kubernetes.io/name,app.kubernetes.io/component]
+    - nodes=[*]
